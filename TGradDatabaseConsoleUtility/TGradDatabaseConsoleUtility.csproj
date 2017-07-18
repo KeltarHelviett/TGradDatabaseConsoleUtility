@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Command.cs" />
+    <Compile Include="Log.cs" />
     <Compile Include="Metabase.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Parameter.cs" />

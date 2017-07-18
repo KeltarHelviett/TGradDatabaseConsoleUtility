@@ -25,30 +25,25 @@ namespace TGradDatabaseConsoleUtility
             var commands = xdoc.Descendants("Command");
             Commands.Clear();
             Commands.Capacity = commands.Count();
-            var types = new List<string>();
             foreach (var command in commands)
             {
-                var name = command.Attribute("Name").ToString();
-                var tmp = command.Attribute("Text").ToString();
-                var i = tmp.IndexOf('.');
-                if (i == -1)
-                    continue;
-                var package = tmp.Substring(0, i).ToLower();
-                var serverName = tmp.Substring(i + 1);
-                var parameters = command.Descendants("Parameter");
-                var com = new Command(name, package, serverName);
-                com.Parameters.Capacity = parameters.Count();
-                foreach (var parameter in parameters)
+                try
                 {
-                    var paramName = parameter.Attribute("Name").Value ?? "";
-                    var paramServerName = parameter.Attribute("ServerName").Value ?? "";                    
-                    var type = parameter.Attribute("Type").Value ?? "";
-                    var direction = parameter.Attribute("Direction").Value ?? "";
-                    var param = new Parameter(paramName, paramServerName, type, direction);
-                    com.Parameters.Add(new Parameter(paramName, paramServerName, type, direction));
+                    
+                    var com = new Command(command);
+                    var parameters = command.Descendants("Parameters").First().Descendants();
+                    foreach (var parameter in parameters)
+                    {
+                        
+                        com.Parameters.Add(new Parameter(parameter));
 
+                    }
+                    Commands.Add(com);
                 }
-                Commands.Add(com);
+                catch (Exception e)
+                {
+                    Log.Error($"{command.Attribute("Name").Value ?? "Unknown"}. ", e.Message);
+                }
             }
         }
     }

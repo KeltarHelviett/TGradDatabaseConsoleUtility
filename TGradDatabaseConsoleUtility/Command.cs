@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace TGradDatabaseConsoleUtility
 {
@@ -16,6 +17,22 @@ namespace TGradDatabaseConsoleUtility
             Name = name;
             Package = Package;
             ServerName = serverName;
+        }
+
+        public Command(XElement command)
+        {
+            try
+            {
+                Name = command.Attribute("Name").Value;
+                var text = command.Attribute("Text").Value;
+                var i = text.IndexOf('.');
+                Package = text.Substring(0, i);
+                ServerName = text.Substring(i + 1);
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"{Name.ToString()} has invalid attributes");
+            }
         }
 
         #endregion

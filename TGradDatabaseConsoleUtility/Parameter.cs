@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace TGradDatabaseConsoleUtility
 {
@@ -13,7 +14,7 @@ namespace TGradDatabaseConsoleUtility
 
     enum ParameterDirection
     {
-        Input, Output
+        Input, Output, ReturnValue
     }
 
     class Parameter
@@ -27,6 +28,21 @@ namespace TGradDatabaseConsoleUtility
             ServerName = serverName;
             Type = StringToParameterType[type];
             Direction = StringToParameterDirection[direction];
+        }
+
+        public Parameter(XElement param)
+        {
+            try
+            {
+                Name = param.Attribute("Name").Value;
+                ServerName = param.Attribute("ServerName").Value;
+                Type = StringToParameterType[param.Attribute("Type").Value];
+                Direction = StringToParameterDirection[param.Attribute("Direction").Value];
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Parameter {Name.ToString()} has invalid attributes");
+            }
         }
 
         #endregion
@@ -51,14 +67,23 @@ namespace TGradDatabaseConsoleUtility
 
         public static Dictionary<string, ParameterType> StringToParameterType { get; } = new Dictionary<string, ParameterType>
         {
-            {"Number", ParameterType.Number},
-            {"Decimal", ParameterType.Decimal}
+            { "Number", ParameterType.Number },
+            { "Decimal", ParameterType.Decimal },
+            { "Cursor", ParameterType.Cursor },
+            { "AnsiString", ParameterType.AnsiString },
+            { "Clob", ParameterType.Clob },
+            { "DateTime", ParameterType.DateTime },
+            { "Blob", ParameterType.Blob },
+            { "String", ParameterType.String },
+            { "Date", ParameterType.Date },
+            { "Timestamp", ParameterType.Timestamp }
         };
 
         public static Dictionary<string, ParameterDirection> StringToParameterDirection { get; } = new Dictionary<string, ParameterDirection>
         {
-            {"Input", ParameterDirection.Input},
-            {"Output", ParameterDirection.Output}
+            { "Input", ParameterDirection.Input },
+            { "Output", ParameterDirection.Output },
+            { "ReturnValue", ParameterDirection.ReturnValue }
         };
 
         #endregion
