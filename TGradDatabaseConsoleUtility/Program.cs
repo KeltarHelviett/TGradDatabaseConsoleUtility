@@ -10,12 +10,12 @@ namespace TGradDatabaseConsoleUtility
     {
         static void Main(string[] args)
         {
-            var options = new Options();
             try
             {
-                if (CommandLine.Parser.Default.ParseArguments(args, options))
+                if (CommandLine.Parser.Default.ParseArguments(args, Options.Instance))
                 {
-                    Metabase.ReadFromXmlFile(options.MetabaseXml);
+                    Metabase.ReadFromXmlFile(Options.Instance.MetabaseXml);
+                    Database.LoadPackagesFromFolder(Options.Instance.DBPackagesFolder);
                 }
             }
             catch (Exception e)

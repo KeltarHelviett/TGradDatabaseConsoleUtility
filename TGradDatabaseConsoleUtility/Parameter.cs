@@ -14,7 +14,7 @@ namespace TGradDatabaseConsoleUtility
 
     enum ParameterDirection
     {
-        Input, Output, ReturnValue
+        Input, Output, ReturnValue, InputOutput
     }
 
     class Parameter
@@ -63,7 +63,7 @@ namespace TGradDatabaseConsoleUtility
 
         #endregion
 
-        #region StaticProperties
+        #region StaticPublicProperties
 
         public static Dictionary<string, ParameterType> StringToParameterType { get; } = new Dictionary<string, ParameterType>
         {
@@ -83,7 +83,8 @@ namespace TGradDatabaseConsoleUtility
         {
             { "Input", ParameterDirection.Input },
             { "Output", ParameterDirection.Output },
-            { "ReturnValue", ParameterDirection.ReturnValue }
+            { "ReturnValue", ParameterDirection.ReturnValue },
+            { "InputOutput", ParameterDirection.InputOutput }
         };
 
         #endregion

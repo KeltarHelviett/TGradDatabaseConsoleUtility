@@ -12,6 +12,10 @@ namespace TGradDatabaseConsoleUtility
 {
     class Options
     {
+        private Options () { }
+
+        public static Options Instance { get; } = new Options();
+
         [Option('v', "verbose", DefaultValue = false, HelpText = "Print all information")]
         public bool Verbose { get; set; }
 
