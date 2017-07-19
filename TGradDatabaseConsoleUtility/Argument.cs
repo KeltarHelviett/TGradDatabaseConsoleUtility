@@ -13,7 +13,7 @@ namespace TGradDatabaseConsoleUtility
 
     enum ArgumentDirection
     {
-        Input, Output, InputOutput, ReturnValue
+        Input = 1, Output, InputOutput, ReturnValue
     }
 
     class Argument

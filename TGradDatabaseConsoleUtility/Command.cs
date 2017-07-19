@@ -31,7 +31,7 @@ namespace TGradDatabaseConsoleUtility
             }
             catch (Exception e)
             {
-                throw new Exception($"{Name.ToString()} has invalid attributes");
+                throw new Exception($"Command has invalid attributes.");
             }
         }
 

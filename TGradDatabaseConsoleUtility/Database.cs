@@ -7,11 +7,15 @@ using System.IO;
 
 namespace TGradDatabaseConsoleUtility
 {
-    static class Database
+    class Database
     {
-        public static  List<Package> Packages { get; } = new List<Package>();
+        private Database() { }
 
-        public static void LoadPackagesFromFolder(string folder)
+        public static Database Instance { get; } = new Database();
+
+        public List<Package> Packages { get; } = new List<Package>();
+
+        public void LoadPackagesFromFolder(string folder)
         {
             var files = Directory.GetFiles(folder).Select(s => s).Where(s => s.EndsWith(".pck"));
             Packages.Capacity = files.Count();

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,15 +13,19 @@ using System.Runtime.Serialization.Formatters;
 
 namespace TGradDatabaseConsoleUtility
 {
-    static class Metabase
+    class Metabase
     {
+        private Metabase() { }
+
+        public static Metabase Instance { get; } = new Metabase();
+
         #region PublicProperties
 
-        public static List<Command> Commands { get; } = new List<Command>();
+        public List<Command> Commands { get; } = new List<Command>();
 
         #endregion
 
-        public static void ReadFromXmlFile(string fileName)
+        public void ReadFromXmlFile(string fileName)
         {             
             var xdoc = XDocument.Load(fileName);
             var commands = xdoc.Descendants("Command");
@@ -42,7 +48,7 @@ namespace TGradDatabaseConsoleUtility
                 }
                 catch (Exception e)
                 {
-                    Log.Error($"{command.Attribute("Name").Value ?? "Unknown"}. ", e.Message);
+                    Log.Error($"Entity { command.Parent.Parent.Attribute("Name")?.Value ?? "Unknown"}, Command {command.Attribute("Name")?.Value ?? "Unknown"}. ", e.Message);
                 }
             }
         }

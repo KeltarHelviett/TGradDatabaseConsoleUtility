@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="Argument.cs" />
     <Compile Include="Command.cs" />
+    <Compile Include="Comparator.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="Function.cs" />
     <Compile Include="Log.cs" />

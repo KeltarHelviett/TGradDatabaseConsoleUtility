@@ -14,7 +14,7 @@ namespace TGradDatabaseConsoleUtility
 
     enum ParameterDirection
     {
-        Input, Output, ReturnValue, InputOutput
+        Input = 1, Output, InputOutput, ReturnValue
     }
 
     class Parameter

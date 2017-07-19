@@ -119,8 +119,8 @@ namespace TGradDatabaseConsoleUtility
                 }
                 catch (Exception e)
                 {
-
-                    Log.Warn(string.Join(" ", components), $"  {this.Name} package, subroutine {subroutine.Name}");
+                    if (Options.Instance.Verbose)
+                        Log.Warn(string.Join(" ", components), $"  {this.Name} package, subroutine {subroutine.Name}");
                     correct = false;
                 }
                 
