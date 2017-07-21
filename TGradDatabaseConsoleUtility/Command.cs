@@ -24,6 +24,10 @@ namespace TGradDatabaseConsoleUtility
             try
             {
                 Name = command.Attribute("Name").Value;
+                var solution = command.Parent.Parent.Parent.Parent.Parent.Parent.Attribute("Name")?.Value ?? "UnknownSolution";
+                var project = command.Parent.Parent.Parent.Parent.Attribute("Name")?.Value ?? "UnknownProject";
+                var entity = command.Parent.Parent.Attribute("Name")?.Value ?? "UnknownEntity";
+                FullName = $"{solution}.{project}.{entity}.{Name}";
                 var text = command.Attribute("Text").Value;
                 var i = text.IndexOf('.');
                 Package = text.Substring(0, i);
@@ -40,6 +44,8 @@ namespace TGradDatabaseConsoleUtility
         #region PublicProperties
 
         public string Name { set; get; }
+
+        public string FullName { set; get; }
 
         public string Package { set; get; }
 

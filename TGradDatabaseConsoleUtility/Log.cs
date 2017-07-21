@@ -10,12 +10,17 @@ namespace TGradDatabaseConsoleUtility
     {
         public static void Warn(string highlightedText, string text)
         {
-            LogText(ConsoleColor.Yellow, $"WARN: {highlightedText}", text);
+            LogText(ConsoleColor.Yellow, $"WARNING: {highlightedText}", text);
         }
 
         public static void Error(string highlightedText, string text)
         {
             LogText(ConsoleColor.Red, $"ERROR: {highlightedText}", text);
+        }
+
+        public static void PositiveResult(string highlightedText, string text)
+        {
+            LogText(ConsoleColor.Green, highlightedText, text);
         }
 
         public static void LogText(ConsoleColor color, string highlightedText, string text)

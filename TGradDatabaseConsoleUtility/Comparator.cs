@@ -12,10 +12,16 @@ namespace TGradDatabaseConsoleUtility
         {
             foreach (var command in metabase.Commands)
             {
+                if (command.ServerName.ToLower() == "get_service")
+                    Console.WriteLine("Hello");
                 if (!IsCommandInDatabase(command, database))
                 {
                     Log.Error("Command doesn't exist in database or doesn't match any overload. ",
-                        $"Command Name={command.Name}, Package={command.Package}, ServerName={command.ServerName}");
+                        $"Command {command.FullName}");
+                }
+                else if (Options.Instance.Verbose)
+                {
+                    Log.PositiveResult($"MATCHED: ", $"{command.FullName}, Package={command.Package}, ServerName={command.ServerName}");
                 }
             }
         }
@@ -105,10 +111,12 @@ namespace TGradDatabaseConsoleUtility
                 var exists = false;
                 foreach (var argument in procedure.Arguments)
                 {
-                    if (string.Equals(parameter.ServerName, argument.Name, StringComparison.CurrentCultureIgnoreCase) &&
-                        ParameterTypeToArgumentType[parameter.Type] == argument.Type &&
-                        (int) parameter.Direction == (int) argument.Direction)
-                        exists = true;
+                    if (!string.Equals(parameter.ServerName, argument.Name,
+                            StringComparison.CurrentCultureIgnoreCase) ||
+                        ParameterTypeToArgumentType[parameter.Type] != argument.Type ||
+                        (int) parameter.Direction != (int) argument.Direction) continue;
+                    exists = true;
+                    break;
                 }
                 if (exists) continue;
                 res = false;

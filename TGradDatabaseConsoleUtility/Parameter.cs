@@ -41,7 +41,7 @@ namespace TGradDatabaseConsoleUtility
             }
             catch (Exception e)
             {
-                throw new Exception($"Parameter {Name.ToString()} has invalid attributes");
+                throw new Exception($"Parameter {Name} has invalid attributes");
             }
         }
 
@@ -51,15 +51,11 @@ namespace TGradDatabaseConsoleUtility
 
         public string Name { set; get; }
 
-        //public string ACL { set; get; }
-
         public string ServerName { set; get; }
         
         public ParameterType Type { set; get; }
 
         public ParameterDirection Direction { set; get; }
-
-        //public string Value { set; get; }
 
         #endregion
 

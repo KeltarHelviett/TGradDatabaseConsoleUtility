@@ -17,7 +17,7 @@ namespace TGradDatabaseConsoleUtility
         {
             var package = File.ReadAllText(filePath);
             Name = Path.GetFileNameWithoutExtension(filePath).ToLower();
-            package = Regex.Replace(package, @"--(.*?)\r?\n", ""); //get rid of comments
+            package = Regex.Replace(package, @"--(.*?)\r?\n", "");
             GetProcedures(package);
             GetFunctions(package);
         }

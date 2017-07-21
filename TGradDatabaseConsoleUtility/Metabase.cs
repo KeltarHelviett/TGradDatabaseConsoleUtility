@@ -31,24 +31,25 @@ namespace TGradDatabaseConsoleUtility
             var commands = xdoc.Descendants("Command");
             Commands.Clear();
             Commands.Capacity = commands.Count();
+            Command com = null;
             foreach (var command in commands)
             {
                 try
                 {
-                    
-                    var com = new Command(command);
+                    if (command.Attribute("Type")?.Value != "StoredProcedure")
+                        continue;
+                    com = new Command(command);
                     var parameters = command.Descendants("Parameters").First().Descendants();
                     foreach (var parameter in parameters)
                     {
-                        
-                        com.Parameters.Add(new Parameter(parameter));
+                            com.Parameters.Add(new Parameter(parameter));
 
                     }
                     Commands.Add(com);
                 }
                 catch (Exception e)
                 {
-                    Log.Error($"Entity { command.Parent.Parent.Attribute("Name")?.Value ?? "Unknown"}, Command {command.Attribute("Name")?.Value ?? "Unknown"}. ", e.Message);
+                    Log.Error($"{com.FullName ?? "Unknown"}. ", e.Message);
                 }
             }
         }
