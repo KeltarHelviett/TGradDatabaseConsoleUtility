@@ -63,6 +63,7 @@ namespace TGradDatabaseConsoleUtility
 
         private void GetProcedures(string package)
         {
+            
             var matches = GetSubroutines(package, @"(?s)procedure\s*([A-Za-z0-9_]+?)\s*\((.*?)\);");
             foreach (Match match in matches)
             {
@@ -94,7 +95,7 @@ namespace TGradDatabaseConsoleUtility
 
                 try
                 {
-                    for (int i = 1; i < components.Length; ++i)
+                    for (var i = 1; i < components.Length; ++i)
                     {
                         var component = components[i].Trim().ToLower();
                         if (component == "" || component == " ")
@@ -104,7 +105,10 @@ namespace TGradDatabaseConsoleUtility
                         else if (component == "out")
                             _out = true;
                         else if (component == "default")
+                        {
+                            argument.IsDefault = true;
                             break;
+                        }
                         else
                             argument.Type = Argument.StringToArgumentType[component];
                     }
@@ -122,6 +126,7 @@ namespace TGradDatabaseConsoleUtility
                     if (Options.Instance.Verbose)
                         Log.Warn(string.Join(" ", components), $"  {this.Name} package, subroutine {subroutine.Name}");
                     correct = false;
+                    return;
                 }
                 
             }

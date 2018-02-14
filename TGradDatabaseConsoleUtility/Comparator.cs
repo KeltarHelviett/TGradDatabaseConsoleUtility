@@ -10,12 +10,12 @@ namespace TGradDatabaseConsoleUtility
     {
         public static void Compare(Metabase metabase, Database database)
         {
+            var unmatched = 0;
             foreach (var command in metabase.Commands)
             {
-                if (command.ServerName.ToLower() == "get_service")
-                    Console.WriteLine("Hello");
                 if (!IsCommandInDatabase(command, database))
                 {
+                    unmatched++;
                     Log.Error("Command doesn't exist in database or doesn't match any overload. ",
                         $"Command {command.FullName}");
                 }
@@ -24,6 +24,7 @@ namespace TGradDatabaseConsoleUtility
                     Log.PositiveResult($"MATCHED: ", $"{command.FullName}, Package={command.Package}, ServerName={command.ServerName}");
                 }
             }
+            Log.LogText(ConsoleColor.Yellow, "", $"{metabase.Commands.Count - unmatched}/{metabase.Commands.Count} matched");
         }
 
         private static bool IsCommandInDatabase(Command command, Database database)
@@ -72,57 +73,72 @@ namespace TGradDatabaseConsoleUtility
 
         private static bool CheckFunction(Command command, Function function)
         {
-            if (command.Parameters.Count != function.Arguments.Count + 1)
-                return false;
-            var res = true;
-            var returnValueEquals = true;
-            foreach (var parameter in command.Parameters)
+            var correctReturnValue = false;
+            var unmatchedParamsCount = command.Parameters.Count;
+            var unmatchedArgumentsCount = function.Arguments.Count;
+            foreach (var argument in function.Arguments)
             {
                 var exists = false;
-                if (parameter.Direction != ParameterDirection.ReturnValue ||
-                    ParameterTypeToArgumentType[parameter.Type] != function.ReturnValue.Type)
+                foreach (var parameter in command.Parameters)
                 {
-                    returnValueEquals = false;
-                    break;
-                }
+                    if (!correctReturnValue && parameter.Direction == ParameterDirection.ReturnValue &&
+                        ParameterTypeToArgumentType[parameter.Type] == function.ReturnValue.Type)
+                    {
+                        correctReturnValue = true;
+                        unmatchedParamsCount--;
+                    }
 
-                foreach (var argument in function.Arguments)
-                {
-                    if (string.Equals(parameter.ServerName, argument.Name, StringComparison.CurrentCultureIgnoreCase) &&
-                        ParameterTypeToArgumentType[parameter.Type] == argument.Type &&
-                        (int)parameter.Direction == (int)argument.Direction)
+
+
+                    if (string.Equals(parameter.ServerName, argument.Name, StringComparison.CurrentCultureIgnoreCase)
+                        && ParameterTypeToArgumentType[parameter.Type] == argument.Type
+                        && (int) parameter.Direction == (int) argument.Direction)
+                    {
                         exists = true;
-
+                        unmatchedParamsCount--;
+                        unmatchedArgumentsCount--;
+                        break;
+                    }
                 }
+
                 if (exists) continue;
-                res = false;
-                break;
+                if (argument.IsDefault)
+                    unmatchedArgumentsCount--;
+                else
+                    break;
             }
-            return res && returnValueEquals;
+
+            return correctReturnValue && unmatchedParamsCount == 0 && unmatchedArgumentsCount == 0;
         }
 
         private static bool CheckProcedure(Command command, Procedure procedure)
         {
-            if (command.Parameters.Count != procedure.Arguments.Count)
-                return false;
-            var res = true;
-            foreach (var parameter in command.Parameters)
+            var unmatchedParamsCount = command.Parameters.Count;
+            var unmatchedArgumentsCount = procedure.Arguments.Count;
+            foreach (var argument in procedure.Arguments)
             {
                 var exists = false;
-                foreach (var argument in procedure.Arguments)
+                foreach (var parameter in command.Parameters)
                 {
-                    if (!string.Equals(parameter.ServerName, argument.Name,
-                            StringComparison.CurrentCultureIgnoreCase) ||
-                        ParameterTypeToArgumentType[parameter.Type] != argument.Type ||
-                        (int) parameter.Direction != (int) argument.Direction) continue;
-                    exists = true;
-                    break;
+                    if (string.Equals(parameter.ServerName, argument.Name, StringComparison.CurrentCultureIgnoreCase)
+                        && ParameterTypeToArgumentType[parameter.Type] == argument.Type
+                        && (int)parameter.Direction == (int)argument.Direction)
+                    {
+                        exists = true;
+                        unmatchedParamsCount--;
+                        unmatchedArgumentsCount--;
+                        break;
+                    }
                 }
+
                 if (exists) continue;
-                res = false;
-                break;
+                if (argument.IsDefault)
+                    unmatchedArgumentsCount--;
+                else
+                    break;
             }
-            return res;
+
+            return unmatchedParamsCount == 0 && unmatchedArgumentsCount == 0;
         }
         
         private static Dictionary<ParameterType, ArgumentType> ParameterTypeToArgumentType { get; } = new Dictionary<ParameterType, ArgumentType>()

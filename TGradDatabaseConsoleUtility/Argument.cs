@@ -27,6 +27,8 @@ namespace TGradDatabaseConsoleUtility
 
         public ArgumentDirection Direction { set; get; }
 
+        public bool IsDefault { set; get; }
+
         #endregion
 
         #region StaticPublicProperties
