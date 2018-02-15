@@ -38,7 +38,7 @@ namespace TGradDatabaseConsoleUtility
 
         private void GetFunctions(string package)
         {
-            var matches = GetSubroutines(package, @"(?s)function ([A-Za-z0-9_]+?)\s*\((.*?)\)(\s*)return\s*(.+?);");
+            var matches = GetSubroutines(package, @"(?s)function\s+([A-Za-z0-9_]+?)\s*\((.*?)\)(\s*)return\s*(.+?);");
             foreach (Match match in matches)
             {
                 var function = new Function() { Name = match.Groups[1].Value };
@@ -69,7 +69,7 @@ namespace TGradDatabaseConsoleUtility
         private void GetProcedures(string package)
         {
             
-            var matches = GetSubroutines(package, @"(?s)procedure\s*([A-Za-z0-9_]+?)\s*\((.*?)\);");
+            var matches = GetSubroutines(package, @"(?s)procedure\s+([A-Za-z0-9_]+?)\s*\((.*?)\);");
             foreach (Match match in matches)
             {
                 var procedure = new Procedure {Name = match.Groups[1].Value};
