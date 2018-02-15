@@ -44,19 +44,18 @@ namespace TGradDatabaseConsoleUtility
                 Log.Error($"package {command.Package} not found. ", $"Command Name={command.Name}.");
                 return false;
             }
-            var isFucntion = command.Parameters.Any(param => param.Direction == ParameterDirection.ReturnValue);
-            var exists = false;
+            var isFucntion = command.ReturnValue != null;
             if (isFucntion)
             {
                 if (FindFunctionsByName(command, foundPackage).Any(function => CheckFunction(command, function)))
-                    exists = true;
+                    return true;
             }
             else
             {
                 if (FindProceduresByName(command, foundPackage).Any(procedure => CheckProcedure(command, procedure)))
-                    exists = true;
+                    return true;
             }
-            return exists;
+            return false;
         }
 
         private static List<Procedure> FindProceduresByName(Command command, Package package)
@@ -73,23 +72,15 @@ namespace TGradDatabaseConsoleUtility
 
         private static bool CheckFunction(Command command, Function function)
         {
-            var correctReturnValue = false;
             var unmatchedParamsCount = command.Parameters.Count;
             var unmatchedArgumentsCount = function.Arguments.Count;
+            if (function.ReturnValue.Type != ParameterTypeToArgumentType[command.ReturnValue.Type])
+                return false;
             foreach (var argument in function.Arguments)
             {
                 var exists = false;
                 foreach (var parameter in command.Parameters)
                 {
-                    if (!correctReturnValue && parameter.Direction == ParameterDirection.ReturnValue &&
-                        ParameterTypeToArgumentType[parameter.Type] == function.ReturnValue.Type)
-                    {
-                        correctReturnValue = true;
-                        unmatchedParamsCount--;
-                    }
-
-
-
                     if (string.Equals(parameter.ServerName, argument.Name, StringComparison.CurrentCultureIgnoreCase)
                         && ParameterTypeToArgumentType[parameter.Type] == argument.Type
                         && (int) parameter.Direction == (int) argument.Direction)
@@ -108,7 +99,7 @@ namespace TGradDatabaseConsoleUtility
                     break;
             }
 
-            return correctReturnValue && unmatchedParamsCount == 0 && unmatchedArgumentsCount == 0;
+            return unmatchedParamsCount == 0 && unmatchedArgumentsCount == 0;
         }
 
         private static bool CheckProcedure(Command command, Procedure procedure)

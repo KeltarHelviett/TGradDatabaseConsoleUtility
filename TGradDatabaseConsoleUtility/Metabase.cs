@@ -42,8 +42,11 @@ namespace TGradDatabaseConsoleUtility
                     var parameters = command.Descendants("Parameters").First().Descendants();
                     foreach (var parameter in parameters)
                     {
-                            com.Parameters.Add(new Parameter(parameter));
-
+                        var p = new Parameter(parameter);
+                        if (p.Direction != ParameterDirection.ReturnValue)
+                            com.Parameters.Add(p);
+                        else
+                            com.ReturnValue = p;
                     }
                     Commands.Add(com);
                 }
