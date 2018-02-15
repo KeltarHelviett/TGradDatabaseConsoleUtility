@@ -52,7 +52,7 @@ namespace TGradDatabaseConsoleUtility
 
         public string ServerName { set; get; }
 
-        public List<Parameter> Parameters { set; get; } = new List<Parameter>();
+        public Dictionary<string, Parameter> Parameters { set; get; } = new Dictionary<string, Parameter>();
 
         public Parameter ReturnValue { set; get; } = null;
 

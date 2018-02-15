@@ -27,9 +27,9 @@ namespace TGradDatabaseConsoleUtility
 
         #region PublicProperties
 
-        public List<Procedure> Procedures { get; } = new List<Procedure>();
+        public Dictionary<string, List<Procedure>> Procedures { get; } = new Dictionary<string, List<Procedure>>();
 
-        public  List<Function> Functions { get; } = new List<Function>();
+        public  Dictionary<string, List<Function>> Functions { get; } = new Dictionary<string, List<Function>>();
 
         public string Name { set; get; }
 
@@ -50,7 +50,11 @@ namespace TGradDatabaseConsoleUtility
                 if (correctReturnType && correctArguments)
                 {
                     function.ReturnValue = new Argument() { Direction = ArgumentDirection.ReturnValue, Type = returnValueType};
-                    Functions.Add(function);
+                    List<Function> lf;
+                    if (Functions.TryGetValue(function.Name, out lf))
+                        lf.Add(function);
+                    else
+                        Functions.Add(function.Name, new List<Function>() {function});
                 }
                 else
                 {
@@ -71,7 +75,13 @@ namespace TGradDatabaseConsoleUtility
                 bool correct;
                 ParseAgruments(match.Groups[2].Value, procedure, out correct);
                 if (correct)
-                    Procedures.Add(procedure);
+                {
+                    List<Procedure> pl;
+                    if (Procedures.TryGetValue(procedure.Name, out pl))
+                        pl.Add(procedure);
+                    else
+                        Procedures.Add(procedure.Name, new List<Procedure>() {procedure});
+                }
             }
         }
 
@@ -118,7 +128,7 @@ namespace TGradDatabaseConsoleUtility
                         argument.Direction = ArgumentDirection.Output;
                     else
                         argument.Direction = ArgumentDirection.Input;
-                    subroutine.Arguments.Add(argument);
+                    subroutine.Arguments.Add(argument.Name, argument);
                     correct = true;
                 }
                 catch (Exception e)

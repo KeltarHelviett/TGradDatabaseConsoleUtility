@@ -13,15 +13,15 @@ namespace TGradDatabaseConsoleUtility
 
         public static Database Instance { get; } = new Database();
 
-        public List<Package> Packages { get; } = new List<Package>();
+        public Dictionary<string, Package> Packages { get; } = new Dictionary<string, Package>();
 
         public void LoadPackagesFromFolder(string folder)
         {
             var files = Directory.GetFiles(folder).Select(s => s).Where(s => s.EndsWith(".pck"));
-            Packages.Capacity = files.Count();
             foreach (var file in files)
             {
-                Packages.Add(new Package(file));
+                var pck = new Package(file);
+                Packages.Add(pck.Name, pck);
             }
         }
     }

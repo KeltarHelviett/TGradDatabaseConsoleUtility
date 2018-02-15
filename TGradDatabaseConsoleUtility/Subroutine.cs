@@ -8,7 +8,7 @@ namespace TGradDatabaseConsoleUtility
 {
     class Subroutine
     {
-        public List<Argument> Arguments { get; } = new List<Argument>();
+        public Dictionary<string, Argument> Arguments { get; } = new Dictionary<string, Argument>();
 
         public  string Name { set; get; }
     }

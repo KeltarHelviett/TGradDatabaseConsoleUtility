@@ -44,7 +44,7 @@ namespace TGradDatabaseConsoleUtility
                     {
                         var p = new Parameter(parameter);
                         if (p.Direction != ParameterDirection.ReturnValue)
-                            com.Parameters.Add(p);
+                            com.Parameters.Add(p.ServerName, p);
                         else
                             com.ReturnValue = p;
                     }

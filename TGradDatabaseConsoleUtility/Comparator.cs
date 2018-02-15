@@ -31,43 +31,26 @@ namespace TGradDatabaseConsoleUtility
         {
             var lowerPckName = command.Package.ToLower();
             Package foundPackage = null;
-            foreach (var package in database.Packages)
-            {
-                if (lowerPckName == package.Name.ToLower())
-                {
-                    foundPackage = package;
-                    break;
-                }
-            }
-            if (foundPackage == null)
+            if (!database.Packages.TryGetValue(lowerPckName, out foundPackage))
             {
                 Log.Error($"package {command.Package} not found. ", $"Command Name={command.Name}.");
                 return false;
             }
-            var isFucntion = command.ReturnValue != null;
-            if (isFucntion)
-            {
-                if (FindFunctionsByName(command, foundPackage).Any(function => CheckFunction(command, function)))
-                    return true;
-            }
-            else
-            {
-                if (FindProceduresByName(command, foundPackage).Any(procedure => CheckProcedure(command, procedure)))
-                    return true;
-            }
-            return false;
+            if (command.ReturnValue != null)
+                return FindFunctionsByName(command, foundPackage).Any(function => CheckFunction(command, function));
+            return FindProceduresByName(command, foundPackage).Any(procedure => CheckProcedure(command, procedure));
         }
 
         private static List<Procedure> FindProceduresByName(Command command, Package package)
         {
-            var lowerServerName = command.ServerName.ToLower();
-            return package.Procedures.Where(p => p.Name.ToLower() == lowerServerName).ToList();
+            var key = command.ServerName.ToLower();
+            return package.Procedures.ContainsKey(key) ? package.Procedures[key] : new List<Procedure>();
         }
 
         private static List<Function> FindFunctionsByName(Command command, Package package)
         {
-            var lowerServerName = command.ServerName.ToLower();
-            return package.Functions.Where(f => f.Name.ToLower() == lowerServerName).ToList();
+            var key = command.ServerName.ToLower();
+            return package.Functions.ContainsKey(key) ? package.Functions[key] : new List<Function>();
         }
 
         private static bool CheckFunction(Command command, Function function)
@@ -76,27 +59,26 @@ namespace TGradDatabaseConsoleUtility
             var unmatchedArgumentsCount = function.Arguments.Count;
             if (function.ReturnValue.Type != ParameterTypeToArgumentType[command.ReturnValue.Type])
                 return false;
+            var parameters = command.Parameters;
             foreach (var argument in function.Arguments)
             {
                 var exists = false;
-                foreach (var parameter in command.Parameters)
+                var key = argument.Key;
+                var arg = argument.Value;
+                Parameter p;
+                if (parameters.TryGetValue(key, out p) && ParameterTypeToArgumentType[p.Type] == arg.Type
+                    && (int) p.Direction == (int) arg.Direction)
                 {
-                    if (string.Equals(parameter.ServerName, argument.Name, StringComparison.CurrentCultureIgnoreCase)
-                        && ParameterTypeToArgumentType[parameter.Type] == argument.Type
-                        && (int) parameter.Direction == (int) argument.Direction)
-                    {
-                        exists = true;
-                        unmatchedParamsCount--;
-                        unmatchedArgumentsCount--;
-                        break;
-                    }
-                }
-
-                if (exists) continue;
-                if (argument.IsDefault)
+                    unmatchedParamsCount--;
                     unmatchedArgumentsCount--;
-                else
-                    break;
+                    continue;
+                }
+                else if (arg.IsDefault)
+                {
+                    unmatchedArgumentsCount--;
+                    continue;
+                }
+                return false;
             }
 
             return unmatchedParamsCount == 0 && unmatchedArgumentsCount == 0;
@@ -106,27 +88,25 @@ namespace TGradDatabaseConsoleUtility
         {
             var unmatchedParamsCount = command.Parameters.Count;
             var unmatchedArgumentsCount = procedure.Arguments.Count;
+            var parameters = command.Parameters;
             foreach (var argument in procedure.Arguments)
             {
-                var exists = false;
-                foreach (var parameter in command.Parameters)
+                var key = argument.Key;
+                var arg = argument.Value;
+                Parameter p;
+                if (parameters.TryGetValue(key, out p) && ParameterTypeToArgumentType[p.Type] == arg.Type
+                                                       && (int)p.Direction == (int)arg.Direction)
                 {
-                    if (string.Equals(parameter.ServerName, argument.Name, StringComparison.CurrentCultureIgnoreCase)
-                        && ParameterTypeToArgumentType[parameter.Type] == argument.Type
-                        && (int)parameter.Direction == (int)argument.Direction)
-                    {
-                        exists = true;
-                        unmatchedParamsCount--;
-                        unmatchedArgumentsCount--;
-                        break;
-                    }
-                }
-
-                if (exists) continue;
-                if (argument.IsDefault)
+                    unmatchedParamsCount--;
                     unmatchedArgumentsCount--;
-                else
-                    break;
+                    continue;
+                }
+                else if (arg.IsDefault)
+                {
+                    unmatchedArgumentsCount--;
+                    continue;
+                }
+                return false;
             }
 
             return unmatchedParamsCount == 0 && unmatchedArgumentsCount == 0;
