@@ -12,12 +12,13 @@ namespace TGradDatabaseConsoleUtility
     class Package
     {
         #region Ctor
-
+        
         public Package(string filePath)
         {
             var package = File.ReadAllText(filePath);
             Name = Path.GetFileNameWithoutExtension(filePath).ToLower();
-            package = Regex.Replace(package, @"--(.*?)\r?\n", "");
+            package = Regex.Replace(package, @"(--(.*?)\r?\n|/\*(.*?)\*/)", "");
+            package = package.Substring(0, package.IndexOf("package body", StringComparison.OrdinalIgnoreCase));
             GetProcedures(package);
             GetFunctions(package);
         }

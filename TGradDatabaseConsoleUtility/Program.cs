@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,8 @@ namespace TGradDatabaseConsoleUtility
         static void Main(string[] args)
         {
             Console.WriteLine();
+            var sw = new Stopwatch();
+            sw.Start();
             try
             {
                 if (CommandLine.Parser.Default.ParseArguments(args, Options.Instance))
@@ -24,6 +27,8 @@ namespace TGradDatabaseConsoleUtility
             {
                 Console.WriteLine($"\n{e.Message}");
             }
+            sw.Stop();
+            Console.WriteLine(sw.ElapsedMilliseconds.ToString());
         }
     }
 }
